@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bitwarden Export Viewer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+            background-color: #f8f8f8;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        li {
+            padding: 1rem;
+            background-color: #ffffff;
+            border: 1px solid #e5e5e5;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        li:hover {
+            background-color: #e5e5e5;
+        }
+        
+        .popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 2rem;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            font-size: 1rem;
+            color: #333333;
+            width: 90%;
+            max-width: 600px;
+        }
+        
+        .popup h2 {
+            margin-top: 0;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .popup p {
+            margin-bottom: 0.5rem;
+        }
+        
+        .popup strong {
+            font-weight: 500;
+        }
+        
+        .popup button {
+            display: block;
+            margin-top: 1.5rem;
+            background-color: #333333;
+            color: #ffffff;
+            border: none;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .popup button:hover {
+            background-color: #ffffff;
+            color: #333333;
+        }
+        
+        @media screen and (min-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+            li {
+                padding: 1.5rem;
+                font-size: 1.2rem;
+            }
+            .popup {
+                padding: 3rem;
+                font-size: 1.2rem;
+            }
+            .popup button {
+                padding: 1rem 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Bitwarden Export Viewer</h1>
+
+    <ul id="items-list">
+    </ul>
+
+    <div class="popup" id="popup">
+        <h2 id="popup-title"></h2>
+        <p><strong>Username:</strong> <span id="popup-username"></span></p>
+        <p><strong>Password:</strong> <span id="popup-password"></span></p>
+        <p><strong>Notes:</strong> <span id="popup-notes"></span></p>
+        <button id="popup-close">Close</button>
+    </div>
+
+    <script>
+        fetch('data.json')
+            .then(response => response.json())
+            .then(data => {
+                const itemsList = document.getElementById('items-list');
+
+                data.items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item.name;
+
+                    li.appendChild(document.createElement('br'));
+
+                    const usernameSpan = document.createElement('span');
+                    usernameSpan.style.fontSize = '0.8rem';
+                    usernameSpan.textContent = item.login.username;
+                    li.appendChild(usernameSpan);
+
+                    li.addEventListener('click', () => {
+                        const popup = document.getElementById('popup');
+                        const title = document.getElementById('popup-title');
+                        const username = document.getElementById('popup-username');
+                        const password = document.getElementById('popup-password');
+                        const notes = document.getElementById('popup-notes');
+
+                        title.textContent = item.name;
+                        username.textContent = item.login.username;
+                        password.textContent = item.login.password;
+                        notes.textContent = item.notes;
+
+                        if (item.fields) {
+                            item.fields.forEach(field => {
+                                const p = document.createElement('p');
+                                const strong = document.createElement('strong');
+                                strong.textContent = field.name + ': ';
+                                const span = document.createElement('span');
+                                span.textContent = field.value;
+                                p.appendChild(strong);
+                                p.appendChild(span);
+                                notes.appendChild(p);
+                            });
+                        }
+
+                        popup.style.display = 'block';
+                    });
+
+                    itemsList.appendChild(li);
+                });
+
+                const popupClose = document.getElementById('popup-close');
+                popupClose.addEventListener('click', () => {
+                    const popup = document.getElementById('popup');
+                    popup.style.display = 'none';
+                });
+            });
+    </script>
+</body>
+
+</html>
