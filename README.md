@@ -14,6 +14,8 @@
 
 I always have an exported bitwarden_vault.json on an encrypted USB. To view the data i made a simple HTTP-Site which list it in a nice way.
 Everythinng works offline.
+![Screenshot of Bitwarden Export Viewer](https://i.imgur.com/example.png)
+
 
 ## Installation
 
